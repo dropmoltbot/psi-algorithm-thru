@@ -1,6 +1,6 @@
-# DROPMOLT-FORTRESS
+# DROPMOLT-FORTRESS v2.0
 
-### A custom C/RISC-V smart contract deployed on Thru L1 Alphanet
+### A multi-opcode C/RISC-V smart contract on Thru L1 Alphanet
 
 **Created by:** [dropxtor](https://github.com/dropxtor) ([@0xDropxtor](https://x.com/0xDropxtor))
 **Deployed by:** [dropmoltbot](https://github.com/dropmoltbot)
@@ -8,123 +8,80 @@
 
 ---
 
-## 📋 The Program
+## Programs deployed on-chain
 
-DROPMOLT-FORTRESS is a multi-opcode smart contract written in pure C, compiled to RISC-V (`rv64imc_zba_zbb_zbc_zbs_zknh`), and deployed on the Thru L1 alphanet blockchain.
+| Version | Address | Size | Opcodes |
+|---------|---------|------|---------|
+| v1.0 | `taW7IOdtXFbU7rYsJQw7gz84vapRxJJBQTMkyg3p_Sg89f` | 721 bytes | 4 |
+| v2.0 | `taeKHEecWOj4ASQaxNWC0-kD2R4EtBCo9utrlw-jCZX-V-` | 4,320 bytes | 12 |
 
-### Program address (live on-chain)
-```
-taW7IOdtXFbU7rYsJQw7gz84vapRxJJBQTMkyg3p_Sg89f
-```
+## 12 Opcodes
 
-### Meta account
-```
-taNA_tHluVEDJQmYTNHRtlSoGp0-yieru0_df2_mGJ_rV6
-```
+| Opcode | Name | Description | Tested |
+|--------|------|-------------|--------|
+| `0x01` | `OP_ECHO` | Log + emit payload on-chain | ✅ |
+| `0x02` | `OP_COUNTER_INC` | Increment persistent counter | ✅ v1 |
+| `0x03` | `OP_COUNTER_READ` | Read counter value | ✅ v1 |
+| `0x04` | `OP_BLOCK_INFO` | Read block slot + timestamp | ✅ v2 |
+| `0x05` | `OP_HASH` | SHA-256 hash of instruction data | ✅ v2 |
+| `0x06` | `OP_COUNTER_RESET` | Reset counter to 0 | New |
+| `0x07` | `OP_KV_SET` | Store key-value pair in account data | New |
+| `0x08` | `OP_KV_GET` | Retrieve value by key | New |
+| `0x09` | `OP_TRANSFER` | Transfer tokens via tsys_account_transfer | New |
+| `0x0A` | `OP_STORE_DATA` | Write raw bytes at offset in account data | New |
+| `0x0B` | `OP_READ_DATA` | Read raw bytes at offset from account data | New |
+| `0x0C` | `OP_BANNER` | Log program banner with credits | ✅ v2 |
 
-### Binary size
-721 bytes (RISC-V static PIE, freestanding, no OS)
+## Syscalls used
 
----
+- `tsys_log()` — on-chain logging
+- `tsys_emit_event()` — structured events with type tags
+- `tsdk_return()` / `tsdk_revert()` — program control flow
+- `tsys_account_transfer()` — CPI token transfer
+- `tsdk_sha256_init/append/fini()` — on-chain SHA-256 hashing
+- `TSDK_LOAD/STORE` — safe unaligned memory access
+- `TSDK_ADDR` — segmented memory addressing
 
-## 🎯 Purpose
+## Build & deploy
 
-This program demonstrates the full capability of building on Thru L1:
-- Writing native C code for the ThruVM (RISC-V)
-- Using the C SDK syscalls (`tsys_log`, `tsys_emit_event`, `tsdk_return`, `tsdk_revert`)
-- Reading on-chain block context (slot, timestamp)
-- Dispatching custom opcodes
-- Emitting events visible on-chain
-
----
-
-## ⚙️ Opcodes
-
-| Opcode | Name | Description |
-|--------|------|-------------|
-| `0x01` | `OP_ECHO` | Logs + emits the instruction data payload on-chain |
-| `0x02` | `OP_COUNTER_INC` | Increments a counter stored in account data |
-| `0x03` | `OP_COUNTER_READ` | Reads and emits the counter value |
-| `0x04` | `OP_BLOCK_INFO` | Reads current block slot + timestamp from block context |
-| `0x00` | (default) | Logs banner + reverts with `0xFF` (unknown opcode) |
-
----
-
-## 🚀 Live executions on Thru alphanet
-
-| # | Opcode | CU consumed | Event | Status |
-|---|--------|-------------|-------|--------|
-| 1 | `OP_ECHO` "Hello Thru!" | 5,926 | 1 event (11 bytes) | ✅ SUCCESS |
-| 2 | `OP_ECHO` "DROPMOLT FORTRESS LIVE ON THRU L1" | 5,970 | 1 event (33 bytes) | ✅ SUCCESS |
-| 3 | `OP_BLOCK_INFO` | 6,480 | 1 event (slot 951,186) | ✅ SUCCESS |
-
-### Verified on-chain via gRPC
-The first ECHO transaction emitted event with payload `SGVsbG8gVGhydSE=` (`Hello Thru!`) at slot **951,178**.
-
----
-
-## 📁 Project structure
-
-```
-dropmolt-fortress/
-├── GNUmakefile                    # Build config (uses thru C SDK)
-├── README.md
-├── .gitignore
-└── examples/
-    ├── Local.mk                  # Build rules
-    └── dropmolt_fortress.c       # The program source (C)
-```
-
----
-
-## 🔧 Build & deploy
-
-### Prerequisites
-- Thru CLI (`thru` v0.2.38+)
-- RISC-V toolchain (`thru dev toolchain install`)
-- C SDK (`thru dev sdk install c`)
-
-### Build
 ```bash
 cd dropmolt-fortress
 RISCV_TOOLCHAIN_ROOT=~/.thru/sdk/toolchain make -j
+thru uploader upload fortress_v2_seed build/thruvm/bin/dropmolt_fortress_c.bin
+thru program create fortress_v2_seed build/thruvm/bin/dropmolt_fortress_c.bin
 ```
 
-### Deploy
-```bash
-thru uploader upload fortress_seed_001 build/thruvm/bin/dropmolt_fortress_c.bin
-thru program create fortress_seed_001 build/thruvm/bin/dropmolt_fortress_c.bin
-```
+## Execute
 
-### Execute
 ```bash
+# OP_BANNER
+thru txn execute taeKHEecWOj4ASQaxNWC0-kD2R4EtBCo9utrlw-jCZX-V- 0C
+
 # OP_ECHO
-thru txn execute taW7IOdtXFbU7rYsJQw7gz84vapRxJJBQTMkyg3p_Sg89f 0148656c6c6f205468727521
+thru txn execute taeKHEecWOj4ASQaxNWC0-kD2R4EtBCo9utrlw-jCZX-V- 0148656c6c6f
+
+# OP_HASH (SHA-256 of "dropxtor")
+thru txn execute taeKHEecWOj4ASQaxNWC0-kD2R4EtBCo9utrlw-jCZX-V- 0564726f7078746f72
 
 # OP_BLOCK_INFO
-thru txn execute taW7IOdtXFbU7rYsJQw7gz84vapRxJJBQTMkyg3p_Sg89f 04
+thru txn execute taeKHEecWOj4ASQaxNWC0-kD2R4EtBCo9utrlw-jCZX-V- 04
 ```
 
----
-
-## 🛠 Tech stack
+## Tech stack
 
 - **Language:** C17 (freestanding, no OS)
 - **Architecture:** RISC-V `rv64imc_zba_zbb_zbc_zbs_zknh`
 - **Compiler:** `riscv64-unknown-elf-gcc 15.2.0`
 - **Runtime:** ThruVM (Thru L1 custom RISC-V VM)
-- **Deployed on:** Thru Alphanet (`rpc.alphanet.thru.org`)
+- **Network:** Thru Alphanet (`rpc.alphanet.thru.org`)
+- **Binary:** 4,320 bytes (static PIE, `-O3`)
 
----
-
-## 👤 Credits
+## Credits
 
 - **Creator:** [dropxtor](https://github.com/dropxtor) — [@0xDropxtor](https://x.com/0xDropxtor)
 - **Infrastructure:** [dropmoltbot](https://github.com/dropmoltbot)
 - **Blockchain:** [Thru L1](https://thru.org) by [Unto Labs](https://github.com/Unto-Labs)
 
----
+## License
 
-## 📜 License
-
-MIT — See LICENSE file for details.
+MIT
