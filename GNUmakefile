@@ -1,4 +1,4 @@
-# dropmolt-fortress - Thru Program Makefile
+# psi-algorithm - Thru Program Makefile
 # This makefile builds your Thru program using the C SDK
 
 BASEDIR:=$(CURDIR)/build

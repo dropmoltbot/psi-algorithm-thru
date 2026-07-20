@@ -1,5 +1,7 @@
-/* dropmolt-fortress v3.0 — Thru On-Chain Program
+/* Ψ-LG0R1THM v3.0 — Thru On-Chain Program
  *
+ * Name:        Ψ-LG0R1THM (PSI-ALGORITHM)
+ * Glyphe:      Ψ (U+03A8) — psi = psyché / AI consciousness
  * Created by:  dropxtor (@0xDropxtor)
  * Deployed by: dropmoltbot
  * Date:        July 17, 2026
@@ -19,6 +21,7 @@
  * Total opcodes: 20 (v1=4, v2=12, v3=20)
  *
  * Built for Thru ThruVM (RISC-V) by dropxtor
+ * Glyphe Ψ = AI agent mind on-chain
  */
 
 #include <thru-sdk/c/tn_sdk.h>
@@ -59,7 +62,7 @@
 #define OP_HASH_TIMED    0x18U  /* Hash data + block slot (nonce mining sim) */
 
 /* ── State layout ── */
-#define STATE_MAGIC      0x4D4F4C54504F5244ULL  /* "DROPMOLT" */
+#define STATE_MAGIC      0x4D4F544F534C4950ULL  /* "PSILGTM" reverse = LG0R1THM fingerprint */
 #define STATE_MIN_SIZE  20UL
 #define KV_MAX_ENTRIES  16U
 #define KV_MAX_KEY_LEN  31U
@@ -87,8 +90,8 @@
 #define EVT_MINING      0x12U
 
 /* ── Banner ── */
-static char const FORTRESS_BANNER[] =
-  "DROPMOLT-FORTRESS v3.0 // by dropxtor // Thru L1 RISC-V // 20 opcodes // BLS+SHA256+CPI+RLE";
+static char const PSI_BANNER[] =
+  "Ψ-LG0R1THM v3.0 // by dropxtor // Thru L1 RISC-V // 20 opcodes // BLS+SHA256+CPI+MerklE+Mining";
 
 #define VERSION_MAJOR 3U
 #define VERSION_MINOR 0U
@@ -140,7 +143,7 @@ start( void const * instruction_data,
        ulong        instruction_data_sz ) {
 
   if ( instruction_data_sz < 1UL ) {
-    tsys_log( FORTRESS_BANNER, sizeof(FORTRESS_BANNER) - 1U );
+    tsys_log( PSI_BANNER, sizeof(PSI_BANNER) - 1U );
     tsdk_revert( 0x01 );
   }
 
@@ -222,8 +225,8 @@ start( void const * instruction_data,
     }
 
     case OP_BANNER: {
-      tsys_log( FORTRESS_BANNER, sizeof(FORTRESS_BANNER) - 1U );
-      emit_event( EVT_BANNER, FORTRESS_BANNER, sizeof(FORTRESS_BANNER) - 1U );
+      tsys_log( PSI_BANNER, sizeof(PSI_BANNER) - 1U );
+      emit_event( EVT_BANNER, PSI_BANNER, sizeof(PSI_BANNER) - 1U );
       tsdk_return( 0UL );
     }
 
@@ -607,7 +610,7 @@ start( void const * instruction_data,
     }
 
     default: {
-      tsys_log( FORTRESS_BANNER, sizeof(FORTRESS_BANNER) - 1U );
+      tsys_log( PSI_BANNER, sizeof(PSI_BANNER) - 1U );
       tsdk_revert( 0xFF );
     }
   }

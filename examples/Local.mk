@@ -1,4 +1,4 @@
-# Build configuration for dropmolt-fortress
+# Build configuration for psi-algorithm
 # This file defines which programs to build
 
-$(call make-bin,dropmolt_fortress_c,dropmolt_fortress,,-ltn_sdk)
+$(call make-bin,psi_algorithm_c,psi_algorithm,,-ltn_sdk)
