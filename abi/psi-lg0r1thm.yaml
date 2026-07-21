@@ -1,0 +1,260 @@
+abi:
+  package: "dropxtor.psi-lg0r1thm"
+  abi-version: 1
+  package-version: "3.0.0"
+  description: "Psi-LG0R1THM v3.0 - AI agent mind on RISC-V bytecode. 20 opcodes."
+  imports: []
+
+types:
+  - name: "Instruction"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "tag"
+            field-type: { primitive: u8 }
+          - name: "data_len"
+            field-type: { primitive: u16 }
+          - name: "data"
+            field-type:
+              array:
+                size: { field-ref: { path: ["data_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "PsiState"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "magic"
+            field-type: { primitive: u64 }
+          - name: "counter"
+            field-type: { primitive: u64 }
+          - name: "kv_count"
+            field-type: { primitive: u16 }
+          - name: "data_offset"
+            field-type: { primitive: u16 }
+
+  - name: "VersionInfo"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "major"
+            field-type: { primitive: u8 }
+          - name: "minor"
+            field-type: { primitive: u8 }
+          - name: "patch"
+            field-type: { primitive: u8 }
+
+  - name: "KvSetPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "key_len"
+            field-type: { primitive: u8 }
+          - name: "key"
+            field-type:
+              array:
+                size: { field-ref: { path: ["key_len"] } }
+                element-type: { primitive: u8 }
+          - name: "val_len"
+            field-type: { primitive: u16 }
+          - name: "val"
+            field-type:
+              array:
+                size: { field-ref: { path: ["val_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "KvGetPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "key_len"
+            field-type: { primitive: u8 }
+          - name: "key"
+            field-type:
+              array:
+                size: { field-ref: { path: ["key_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "ReadDataPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "offset"
+            field-type: { primitive: u16 }
+          - name: "length"
+            field-type: { primitive: u16 }
+
+  - name: "TransferPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "amount"
+            field-type: { primitive: u64 }
+
+  - name: "MerklePayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "chunk_size"
+            field-type: { primitive: u16 }
+          - name: "data_len"
+            field-type: { primitive: u16 }
+          - name: "data"
+            field-type:
+              array:
+                size: { field-ref: { path: ["data_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "BlsVerifyPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "pubkey"
+            field-type:
+              array:
+                size: { literal: { u64: 96 } }
+                element-type: { primitive: u8 }
+          - name: "signature"
+            field-type:
+              array:
+                size: { literal: { u64: 96 } }
+                element-type: { primitive: u8 }
+          - name: "msg_len"
+            field-type: { primitive: u16 }
+          - name: "message"
+            field-type:
+              array:
+                size: { field-ref: { path: ["msg_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "EventPayload"
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: "event_type"
+            field-type: { primitive: u8 }
+          - name: "data_len"
+            field-type: { primitive: u16 }
+          - name: "data"
+            field-type:
+              array:
+                size: { field-ref: { path: ["data_len"] } }
+                element-type: { primitive: u8 }
+
+  - name: "PsiError"
+    kind:
+      enum:
+        packed: true
+        tag-ref:
+          field-ref:
+            path: ["tag"]
+        variants:
+          - name: "NoInstructionData"
+            tag-value: 1
+            variant-type: { primitive: u8 }
+          - name: "EmptyHashInput"
+            tag-value: 2
+            variant-type: { primitive: u8 }
+          - name: "KvPayloadTooSmall"
+            tag-value: 3
+            variant-type: { primitive: u8 }
+          - name: "KvMaxEntries"
+            tag-value: 4
+            variant-type: { primitive: u8 }
+          - name: "KvKeyTooLong"
+            tag-value: 5
+            variant-type: { primitive: u8 }
+          - name: "KvValTooLong"
+            tag-value: 6
+            variant-type: { primitive: u8 }
+          - name: "KvPayloadIncomplete"
+            tag-value: 7
+            variant-type: { primitive: u8 }
+          - name: "KvNoSpace"
+            tag-value: 8
+            variant-type: { primitive: u8 }
+          - name: "KvKeyMissing"
+            tag-value: 9
+            variant-type: { primitive: u8 }
+          - name: "KvKeyInvalid"
+            tag-value: 10
+            variant-type: { primitive: u8 }
+          - name: "TransferTooSmall"
+            tag-value: 11
+            variant-type: { primitive: u8 }
+          - name: "TransferFailed"
+            tag-value: 12
+            variant-type: { primitive: u8 }
+          - name: "StoreTooSmall"
+            tag-value: 13
+            variant-type: { primitive: u8 }
+          - name: "StoreOutOfBounds"
+            tag-value: 14
+            variant-type: { primitive: u8 }
+          - name: "ReadTooSmall"
+            tag-value: 15
+            variant-type: { primitive: u8 }
+          - name: "ReadOutOfBounds"
+            tag-value: 16
+            variant-type: { primitive: u8 }
+          - name: "MerkleTooSmall"
+            tag-value: 32
+            variant-type: { primitive: u8 }
+          - name: "MerkleChunkInvalid"
+            tag-value: 33
+            variant-type: { primitive: u8 }
+          - name: "MerkleNoChunks"
+            tag-value: 34
+            variant-type: { primitive: u8 }
+          - name: "ResizeTooSmall"
+            tag-value: 48
+            variant-type: { primitive: u8 }
+          - name: "ResizeInvalid"
+            tag-value: 49
+            variant-type: { primitive: u8 }
+          - name: "ResizeFailed"
+            tag-value: 50
+            variant-type: { primitive: u8 }
+          - name: "CreateTooSmall"
+            tag-value: 64
+            variant-type: { primitive: u8 }
+          - name: "CreateFailed"
+            tag-value: 65
+            variant-type: { primitive: u8 }
+          - name: "FlagsTooSmall"
+            tag-value: 80
+            variant-type: { primitive: u8 }
+          - name: "FlagsFailed"
+            tag-value: 81
+            variant-type: { primitive: u8 }
+          - name: "InvokeTooSmall"
+            tag-value: 96
+            variant-type: { primitive: u8 }
+          - name: "InvokeFailed"
+            tag-value: 97
+            variant-type: { primitive: u8 }
+          - name: "InvokeCalleeError"
+            tag-value: 98
+            variant-type: { primitive: u8 }
+          - name: "BlsTooSmall"
+            tag-value: 112
+            variant-type: { primitive: u8 }
+          - name: "AnonTooSmall"
+            tag-value: 128
+            variant-type: { primitive: u8 }
+          - name: "AnonFailed"
+            tag-value: 129
+            variant-type: { primitive: u8 }
+          - name: "UnknownOpcode"
+            tag-value: 255
+            variant-type: { primitive: u8 }
